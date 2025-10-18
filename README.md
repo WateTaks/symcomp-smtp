@@ -16,14 +16,8 @@ Ative esse ambiente.
 source venv/bin/activate.
 ```
 
-Instale o pip.
+Depois instale os requisitos
 
 ```
-sudo apt install python3-pip
-```
-
-Depois instale o dotenv
-
-```
-pip install python-dotenv
+pip install -r requirements.txt
 ```

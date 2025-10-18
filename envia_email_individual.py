@@ -6,43 +6,36 @@ from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 
 load_dotenv()
-sender_email = os.getenv('EMAIL_USER')
-password = os.getenv('EMAIL_PASSWORD')
+sender_email = os.getenv('EMAIL_USER').strip()
+password = os.getenv('EMAIL_PASSWORD').strip()
 
-# Lista de emails para serem enviados (agora pode ter múltiplos emails por empresa)
 lista_destinatarios = [
-    ("Example", "example@example.br, outroexample@example.com"),
-    ("Example1", "example1@example1.com, outroexample1@example1.com")
+    ("JOJO", "jonathascastilho@usp.br")
 ]
 
-with open('index.html', 'r') as file:
+with open('index.html', 'r', encoding='utf-8') as file:
     html_template = file.read()
 
 def send_email(subject, html, to_emails):
     smtp_server = 'smtp.gmail.com'
-    smtp_port = 587
+    smtp_port = 465
 
-    message = MIMEMultipart('alternative')
+    message = MIMEMultipart('related')
     message['Subject'] = subject
     message['From'] = sender_email
-    message['To'] = ', '.join(to_emails)  # agora pode receber lista de emails
+    message['To'] = ', '.join(to_emails)
 
     part = MIMEText(html, 'html')
     message.attach(part)
 
-    # Anexando imagens
-    with open('./src/header_2025.png', 'rb') as fp:
-        imageHeader = MIMEImage(fp.read())
-    imageHeader.add_header('Content-ID', '<HeaderImage>')
-    message.attach(imageHeader)
+    for img_path, cid in [('./src/header_2025.png', 'HeaderImage'),
+                          ('./src/cotas_2025.png', 'CotasImage')]:
+        with open(img_path, 'rb') as fp:
+            img = MIMEImage(fp.read())
+        img.add_header('Content-ID', f'<{cid}>')
+        message.attach(img)
 
-    with open('./src/cotas_2025.png', 'rb') as fp:
-        imageCotas = MIMEImage(fp.read())
-    imageCotas.add_header('Content-ID', '<CotasImage>')
-    message.attach(imageCotas)
-
-    with smtplib.SMTP(smtp_server, smtp_port) as server:
-        server.starttls()
+    with smtplib.SMTP_SSL(smtp_server, smtp_port) as server:
         server.login(sender_email, password)
         server.sendmail(sender_email, to_emails, message.as_string())
 
@@ -65,7 +58,6 @@ print("Enviando emails...")
 subject = 'XIV Semana da Computação IME - USP'
 
 for empresa, emails_str in lista_destinatarios:
-    # separa os emails por vírgula e remove espaços extras
     emails = [e.strip() for e in emails_str.split(',')]
     html_personalizado = html_template.replace('{{NOME_EMPRESA}}', empresa)
     try:
