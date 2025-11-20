@@ -7,8 +7,8 @@ import csv
 load_dotenv()
 FILENAME = os.getenv('FILENAME')
 FOLDER = os.getenv('FOLDER')
-SENDER_EMAIL = str(os.getenv('SENDER_EMAIL'))
-PASSWORD = str(os.getenv('PASSWORD'))
+SENDER_EMAIL = str(os.getenv('EMAIL_USER'))
+PASSWORD = str(os.getenv('EMAIL_PASSWORD'))
 
 if FILENAME is None:
     raise ValueError("Missing csv file")
